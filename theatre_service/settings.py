@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "rest_framework",
     "user",
-    "theatre_service"
+    "theatre_service",
+    "theatre",
 ]
 
 MIDDLEWARE = [
