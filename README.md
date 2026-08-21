@@ -40,8 +40,10 @@ cd theatre-api
 ```
 
 ### 2. Environment Configuration
-Create a .env file in the project root:
-```bash
+Create a `.env` file in the project root:
+```dotenv
+SECRET_KEY=your_secret_key_here
+DEBUG=True
 POSTGRES_PASSWORD=theatre
 POSTGRES_USER=theatre
 POSTGRES_DB=theatre
