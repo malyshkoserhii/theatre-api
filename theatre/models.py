@@ -66,6 +66,9 @@ class TheatreHall(models.Model):
 
 
 class Performance(models.Model):
+    class Meta:
+        ordering = ("-show_time", )
+
     play = models.ForeignKey(
         Play,
         related_name="performances",
@@ -77,9 +80,6 @@ class Performance(models.Model):
         on_delete=models.CASCADE
     )
     show_time = models.DateTimeField()
-
-    class Meta:
-        ordering = ("show_time", )
 
     def __str__(self) -> str:
         return (
