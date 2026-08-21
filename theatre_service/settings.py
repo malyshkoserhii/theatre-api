@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 import os
 import socket
@@ -22,7 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-y^fe$epv&9&*z_xbk)%3e1)vv1pu*f@v=erm!qnh4z0!5#3t@h"  # noqa E501
+SECRET_KEY = (
+    "django-insecure-y^fe$epv&9&*z_xbk)%3e1)vv1pu*f@v=erm!qnh4z0!5#3t@h"  # noqa E501
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -41,6 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "debug_toolbar",
     "rest_framework",
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt",
     "user",
     "theatre_service",
     "theatre",
@@ -147,8 +151,23 @@ AUTH_USER_MODEL = "user.User"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]  # noqa E501
+INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + [
+    "127.0.0.1",
+    "10.0.2.2",
+]
 
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK": lambda _request: True,
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=4),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
+    "ROTATE_REFRESH_TOKENS": False,
 }
