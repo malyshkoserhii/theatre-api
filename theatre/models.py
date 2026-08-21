@@ -21,7 +21,7 @@ class Actor(models.Model):
         ordering = ("first_name", )
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
         return self.first_name + " " + self.last_name
 
     def __str__(self) -> str:
@@ -55,7 +55,7 @@ class TheatreHall(models.Model):
     seats_in_row = models.IntegerField()
 
     @property
-    def capacity(self):
+    def capacity(self) -> int:
         return self.rows * self.seats_in_row
 
     class Meta:
