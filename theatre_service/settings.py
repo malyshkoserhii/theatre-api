@@ -149,11 +149,17 @@ AUTH_USER_MODEL = "user.User"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
-INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + [
+INTERNAL_IPS = [
     "127.0.0.1",
     "10.0.2.2",
 ]
+
+if DEBUG:
+    try:
+        _, _, ips = socket.gethostbyname_ex(socket.gethostname())
+        INTERNAL_IPS += [ip[: ip.rfind(".")] + ".1" for ip in ips]
+    except socket.gaierror:
+        pass
 
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK": lambda _request: True,
@@ -167,6 +173,10 @@ REST_FRAMEWORK = {
         "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "10/minute",
         "user": "30/minute",

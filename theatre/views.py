@@ -148,7 +148,7 @@ class PerformanceViewSet(viewsets.ModelViewSet):
                 .prefetch_related("play__genres", "play__actors")
             )
 
-        return queryset
+        return queryset.order_by("-show_time")
 
     def get_serializer_class(self):
         if self.action == "list":
