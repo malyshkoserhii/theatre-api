@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db.models import Count, F, QuerySet
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -26,6 +27,11 @@ from theatre.serializers import (
 )
 
 
+def _params_to_ints(qs: str) -> list[int]:
+    """Converts a string of comma-separated IDs to a list of integers."""
+    return [int(str_id) for str_id in qs.split(",")]
+
+
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -51,9 +57,24 @@ class PlayViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self) -> QuerySet[Play]:
         queryset = self.queryset
+
+        title = self.request.query_params.get("title")
+        genres = self.request.query_params.get("genres")
+        actors = self.request.query_params.get("actors")
+
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        if genres:
+            genres_ids = _params_to_ints(genres)
+            queryset = queryset.filter(genres__id__in=genres_ids)
+        if actors:
+            actors_ids = _params_to_ints(actors)
+            queryset = queryset.filter(actors__id__in=actors_ids)
+
         if self.action in ("list", "retrieve"):
             queryset = queryset.prefetch_related("actors", "genres")
-        return queryset
+
+        return queryset.distinct()
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -72,6 +93,15 @@ class PerformanceViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
+
+        date = self.request.query_params.get("date")
+        play_id = self.request.query_params.get("play")
+
+        if date:
+            date_obj = datetime.strptime(date, "%Y-%m-%d").date()
+            queryset = queryset.filter(show_time__date=date_obj)
+        if play_id:
+            queryset = queryset.filter(play_id=int(play_id))
 
         if self.action == "list":
             queryset = (
